@@ -29,8 +29,8 @@ namespace LogParserDN
                     new XElement("page", rendering.Page),
                     new XElement("uid", rendering.UID));
 
-            rend.Add(rendering.StartRendering.Select(start => new XElement("get", start.ToString("YYYY-MM-DD HH:mm:ss,SSS"))));
-            rend.Add(rendering.GetRendering.Select(get => new XElement("get", get.ToString("YYYY-MM-DD HH:mm:ss,SSS"))));
+            rend.Add(rendering.StartRendering.Select(start => new XElement("start", start.ToString("yyyy-MM-dd HH:mm:ss,fff"))));
+            rend.Add(rendering.GetRendering.Select(get => new XElement("get", get.ToString("yyyy-MM-dd HH:mm:ss,fff"))));
 
             return rend;
         }

@@ -24,33 +24,33 @@ namespace LogParserDN
 
                 ProccessFile(args[0], startEntries, getEntries);
 
-                //for (int i = 0; i < startEntries.Count; i+=2)
-                //{
-                    
-                //    string[] linestart = startEntries[i].Split(new char[] { '[', ']' }, 5, StringSplitOptions.RemoveEmptyEntries);
-                //    DateTime startTS = DateTime.ParseExact(linestart.First().Trim(), "yyyy-MM-dd HH:mm:ss,fff", CultureInfo.InvariantCulture);
-                //    Command cmd = new Command(linestart.Last());
-                //    string uid = startEntries[i + 1].Split(' ').Last();
+                foreach (KeyValuePair<Entry, Entry> startEntry in startEntries)
+                {
+                    Command cmd = new Command(startEntry.Key.Message);
 
-                //    Rendering rend;
-                //    if (report.Renderings.Any(r => r.ID == int.Parse(cmd.Arguments[0])))
-                //    {
-                //        rend = report.Renderings.Single(r => r.ID == int.Parse(cmd.Arguments[0]));
-                //    }
-                //    else
-                //    {
-                //        rend = new Rendering { ID = int.Parse(cmd.Arguments[0]), Page = int.Parse(cmd.Arguments[1]), UID = uid };
-                //        report.Renderings.Add(rend);
-                //    }
+                    Rendering rend;
+                    if (report.Renderings.Any(r => r.ID == int.Parse(cmd.Arguments[0])))
+                    {
+                        rend = report.Renderings.Single(r => r.ID == int.Parse(cmd.Arguments[0]));
+                    }
+                    else
+                    {
+                        rend = new Rendering { ID = int.Parse(cmd.Arguments[0]), Page = int.Parse(cmd.Arguments[1]), UID = startEntry.Value.Message.Split(' ').Last() };
+                        report.Renderings.Add(rend);
+                    }
 
-                //    rend.StartRendering.Add(startTS);
-                //}
+                    rend.StartRendering.Add(startEntry.Key.TimeStamp);
+                }
 
-                //foreach (var entry in getEntries)
-                //{
-                //    Command cmd = new Command(entry.Message);
-                //    report.Renderings.Last(r => r.UID == cmd.Arguments.First()).GetRendering.Add(entry.TimeStamp);
-                //}
+                foreach (var entry in getEntries)
+                {
+                    try
+                    {
+                        Command cmd = new Command(entry.Message);
+                        report.Renderings.Last(r => r.UID == cmd.Arguments.First()).GetRendering.Add(entry.TimeStamp);
+                    }
+                    catch { }
+                }
 
                 report.Save(args[1]);
             }
