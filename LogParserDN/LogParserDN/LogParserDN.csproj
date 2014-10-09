@@ -44,14 +44,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Command.cs" />
-    <Compile Include="Entry.cs" />
-    <Compile Include="ISave.cs" />
+    <Compile Include="Utilities\Command.cs" />
+    <Compile Include="Utilities\Entry.cs" />
+    <Compile Include="Savers\ISave.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Rendering.cs" />
-    <Compile Include="Report.cs" />
-    <Compile Include="XMLSave.cs" />
+    <Compile Include="Business\Rendering.cs" />
+    <Compile Include="Business\Report.cs" />
+    <Compile Include="Savers\XMLSave.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

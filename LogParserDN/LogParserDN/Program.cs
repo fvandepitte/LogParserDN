@@ -15,44 +15,28 @@ namespace LogParserDN
         static IKernel KERNEL;
 
         static void Main(string[] args) {
-            if (args.Length > 0)
+            if (args.Length == 2)
             {
                 Setup();
+                Console.WriteLine("Startup LogParserDN");
+
                 Report report = KERNEL.Get<Report>();
                 Dictionary<Entry, Entry> startEntries = new Dictionary<Entry, Entry>();
                 List<Entry> getEntries = new List<Entry>();
 
-                ProccessFile(args[0], startEntries, getEntries);
+                Console.WriteLine("Reading {0}", args[0]);
 
-                foreach (KeyValuePair<Entry, Entry> startEntry in startEntries)
-                {
-                    Command cmd = new Command(startEntry.Key.Message);
+                ParseFile(args[0], startEntries, getEntries);
 
-                    Rendering rend;
-                    if (report.Renderings.Any(r => r.ID == int.Parse(cmd.Arguments[0])))
-                    {
-                        rend = report.Renderings.Single(r => r.ID == int.Parse(cmd.Arguments[0]));
-                    }
-                    else
-                    {
-                        rend = new Rendering { ID = int.Parse(cmd.Arguments[0]), Page = int.Parse(cmd.Arguments[1]), UID = startEntry.Value.Message.Split(' ').Last() };
-                        report.Renderings.Add(rend);
-                    }
+                Console.WriteLine("Proccessing info");
 
-                    rend.StartRendering.Add(startEntry.Key.TimeStamp);
-                }
+                ProccessInfo(report, startEntries, getEntries);
 
-                foreach (var entry in getEntries)
-                {
-                    try
-                    {
-                        Command cmd = new Command(entry.Message);
-                        report.Renderings.Last(r => r.UID == cmd.Arguments.First()).GetRendering.Add(entry.TimeStamp);
-                    }
-                    catch { }
-                }
+                Console.WriteLine("Saving To {0}", args[1]);
 
                 report.Save(args[1]);
+
+                Console.WriteLine("Done");
             }
             else
             {
@@ -61,7 +45,37 @@ namespace LogParserDN
             }
         }
 
-        private static void ProccessFile(string input, Dictionary<Entry, Entry> startEntries, List<Entry> getEntries) {
+        private static void ProccessInfo(Report report, Dictionary<Entry, Entry> startEntries, List<Entry> getEntries) {
+            foreach (KeyValuePair<Entry, Entry> startEntry in startEntries)
+            {
+                Command cmd = new Command(startEntry.Key.Message);
+
+                Rendering rend;
+                if (report.Renderings.Any(r => r.ID == int.Parse(cmd.Arguments[0])))
+                {
+                    rend = report.Renderings.Single(r => r.ID == int.Parse(cmd.Arguments[0]));
+                }
+                else
+                {
+                    rend = new Rendering { ID = int.Parse(cmd.Arguments[0]), Page = int.Parse(cmd.Arguments[1]), UID = startEntry.Value.Message.Split(' ').Last() };
+                    report.Renderings.Add(rend);
+                }
+
+                rend.StartRendering.Add(startEntry.Key.TimeStamp);
+            }
+
+            foreach (var entry in getEntries)
+            {
+                try
+                {
+                    Command cmd = new Command(entry.Message);
+                    report.Renderings.Last(r => r.UID == cmd.Arguments.First()).GetRendering.Add(entry.TimeStamp);
+                }
+                catch { }
+            }
+        }
+
+        private static void ParseFile(string input, Dictionary<Entry, Entry> startEntries, List<Entry> getEntries) {
             Regex cmdStart = new Regex(".*Processing command object.*startRendering.*");
             Regex returnStart = new Regex(".*Service startRendering returned.*");
             Regex cmdGet = new Regex(".*Processing command object.*getRendering.*");
